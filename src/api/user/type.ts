@@ -35,6 +35,8 @@ export interface userFormType extends formType{
     nickName: string,
     salt?: string,
     isAdmin?: number | null,
+    cityId?: string | null,
+    orgId?:String | null,
     status?: number | null,
     beginTime?: string,
     endTime?: string,

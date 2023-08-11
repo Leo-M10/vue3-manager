@@ -85,20 +85,29 @@
         <el-row>
           <el-col :span="8">
             <el-form-item label="账号" prop="username">
-              <el-input v-model="addUserForms.username"></el-input>
+              <el-input class="input_style" v-model="addUserForms.username"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="用户名" prop="nickName">
-              <el-input v-model="addUserForms.nickName"></el-input>
+              <el-input class="input_style" v-model="addUserForms.nickName"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="管理员" prop="isAdmin">
-              <el-select v-model="addUserForms.isAdmin" clearable placeholder="" style="width: 200px">
+              <el-select class="input_style" v-model="addUserForms.isAdmin" clearable placeholder="">
                 <el-option label="是" value="0"/>
                 <el-option label="否" value="1"/>
               </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="8">
+            <el-form-item label="所在地区" prop="cityId">
+              <el-tree-select class="input_style" v-model="addUserForms.cityId" :data="cityList"
+                              :props="{children: 'child',label: 'cityName',value: 'id'}"
+                              :render-after-expand="false" check-strictly=true></el-tree-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -118,7 +127,14 @@
 import {CirclePlus, Delete, Edit, Search, StarFilled, Upload} from '@element-plus/icons-vue'
 import type {Ref} from "vue"
 import {onMounted, reactive, ref} from "vue";
-import {requestAddUser, requestDeleteUser, requestExportUser, requestSetUserStatus, requestUserList} from "@/api/user";
+import {
+  requestAddUser,
+  requestDeleteUser,
+  requestExportUser,
+  requestGetCityTree,
+  requestSetUserStatus,
+  requestUserList
+} from "@/api/user";
 import type {responseType, userFormType} from "@/api/user/type";
 import PageBottom from '@/layout/pageBottom/index.vue'
 import type {FormInstance, FormRules} from "element-plus";
@@ -140,6 +156,8 @@ const searchForms: userFormType = reactive({
 let searchFormRef = ref<FormInstance>()
 let addUserFormsRef = ref<FormInstance>()
 let userList = ref([])
+let cityList = ref([])
+let cityId = ref(1)
 let total = ref(null)
 let addUserDialog = ref(false)
 let selectListData: Ref<string[]> = ref([])
@@ -148,6 +166,8 @@ const addUserForms: userFormType = reactive({
   username: '',
   nickName: '',
   isAdmin: null,
+  cityId: '',
+  orgId: '',
 })
 
 const usernameValid = (rule: any, value: any, callback: any) => {
@@ -171,6 +191,7 @@ const addUserRules = reactive<FormRules>({
 onMounted(() => {
 
   getUserList(searchForms);
+  getCityTree(cityId.value)
 
 })
 //重置页码
@@ -198,6 +219,11 @@ const getUserList = async (data: userFormType | null) => {
   const {data: result}: responseType<any> = await requestUserList(data)
   userList.value = result.list
   total.value = result.total
+}
+//获取城市地区数据
+const getCityTree = async (cityId: number) => {
+  const {data: result}: responseType<any> = await requestGetCityTree(cityId)
+  cityList.value = result
 }
 //页码改变触发
 const changePageNum = (val: number) => {
@@ -300,8 +326,13 @@ const exportUserData = () => {
       height: calc(100vh - 362px);
     }
   }
+
   /deep/ .el-dialog {
     border-radius: 20px;
   }
+}
+
+.input_style {
+  width: 200px;
 }
 </style>

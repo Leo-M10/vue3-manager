@@ -9,7 +9,8 @@ enum Api {
     setUserStatus_Url = '/sysUser/updateStatus',
     addUser_Url = '/sysUser/add',
     deleteUser_Url = '/sysUser/deleteBatch',
-    exportUser_Url = '/sysUser/export'
+    exportUser_Url = '/sysUser/export',
+    getCityTree_Url = 'sysUser/getCityTree',
 }
 //暴露请求函数
 //登录函数
@@ -24,6 +25,8 @@ export const requestSetUserStatus = (data: userFormType) => request.put<response
 export const requestAddUser = (data: userFormType) => request.post<responseType<any>>(Api.addUser_Url,data)
 //删除用户
 export const requestDeleteUser = (data: string[]) => request.delete<responseType<any>>(`${Api.deleteUser_Url}/${data}`)
+//city树
+export const requestGetCityTree = (data: number) => request.get<responseType<any>>(Api.getCityTree_Url + '?cityId=' + data)
 
 export const requestExportUser = () => {
     request.get(Api.exportUser_Url,{responseType: 'blob',headers: {'Content-Type': 'application/json; application/octet-stream'}}).then(res=>{
