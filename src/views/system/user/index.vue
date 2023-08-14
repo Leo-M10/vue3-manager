@@ -105,8 +105,8 @@
         <el-row>
           <el-col :span="8">
             <el-form-item label="所在地区" prop="cityId">
-              <el-tree-select class="input_style" v-model="addUserForms.cityId" :data="cityList"
-                              :props="{children: 'child',label: 'cityName',value: 'id'}"
+              <el-tree-select class="input_style" v-model="addUserForms.cityId" lazy :load="loadNode"
+                              :props="{children: 'child',label: 'cityName',value: 'id',isLeaf: 'isLeaf'}"
                               :render-after-expand="false" check-strictly=true></el-tree-select>
             </el-form-item>
           </el-col>
@@ -157,7 +157,7 @@ let searchFormRef = ref<FormInstance>()
 let addUserFormsRef = ref<FormInstance>()
 let userList = ref([])
 let cityList = ref([])
-let cityId = ref(1)
+let cityId = ref(100000)
 let total = ref(null)
 let addUserDialog = ref(false)
 let selectListData: Ref<string[]> = ref([])
@@ -169,7 +169,11 @@ const addUserForms: userFormType = reactive({
   cityId: '',
   orgId: '',
 })
-
+const loadNode = async (node:any,resolve: any) => {
+  if (node.isLeaf) return resolve([])
+  if (node.data.id) await getCityTree(node.data.id)
+  resolve(cityList.value)
+}
 const usernameValid = (rule: any, value: any, callback: any) => {
   if (!value) callback(new Error('账号不能为空!'))
   if (!/^[0-9a-zA-Z]{5,12}$/.test(value)) callback(new Error('格式不正确!'))
